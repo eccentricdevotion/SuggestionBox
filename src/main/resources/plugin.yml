@@ -1,0 +1,54 @@
+author: eccentric_nz
+description: SuggestionBox is a plugin for obtaining suggestions, comments, questions, and requests for your Bukkit server.
+main: me.eccentric_nz.plugins.suggestionbox.SuggestionBox
+name: SuggestionBox
+startup: postworld
+dev-url: http://dev.bukkit.org/server-mods/suggestionbox/
+version: '1.0'
+permissions:
+  suggest.admin:
+    description: Allow players access administer SuggestionBox.
+    default: op
+  suggest.use:
+    description: Allow players to make and list suggestions.
+    default: true
+  suggest.read:
+    description: Allow players to read suggestions, comments, questions, and requests.
+    default: op
+commands:
+  suggest:
+    aliases: [sb,suggestbox]
+    description: Make a suggestion, comment, question or request.
+    usage: /<command> [s|c|q|r] [suggestion]
+    permission: suggest.use
+    permission-message: You don't have the permission <permission> to use this command
+  sblist:
+    aliases: [sbl,suggestboxlist,suggestlist]
+    description: List suggestions, comments, questions or requests.
+    usage: /<command>
+    permission: suggest.use
+    permission-message: You don't have the permission <permission> to use this command
+  sbread:
+    aliases: [sbr,suggestboxread,suggestread]
+    description: Read suggestions, comments, questions or requests.
+    usage: /<command> [SuggestionBox ID]
+    permission: suggest.read
+    permission-message: You don't have the permission <permission> to use this command
+  sbfile:
+    aliases: [sbf,suggestboxfile,suggestfile]
+    description: Save suggestions to file.
+    usage: /<command>
+    permission: suggest.admin
+    permission-message: You don't have the permission <permission> to use this command
+  sbdelete:
+    aliases: [sbd,suggestboxdelete,suggestdelete]
+    description: Delete a suggestion, comment, question or request.
+    usage: /<command> [SuggestionBox ID]
+    permission: suggest.admin
+    permission-message: You don't have the permission <permission> to use this command
+  sbpriority:
+    aliases: [sbp,suggestboxpriority,suggestpriority]
+    description: Set the priority of a suggestion, comment, question or request.
+    usage: /<command> [SuggestionBox ID] [NORMAL|MEDIUM|HIGH]
+    permission: suggest.admin
+    permission-message: You don't have the permission <permission> to use this command
