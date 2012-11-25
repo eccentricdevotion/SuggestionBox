@@ -29,11 +29,14 @@ public class SuggestionBox extends JavaPlugin implements Listener {
             getDataFolder().setWritable(true);
             getDataFolder().setExecutable(true);
         }
-
         try {
             String path = getDataFolder() + File.separator + "SuggestionBox.db";
             service.setConnection(path);
             service.createTables();
+            if (getConfig().getBoolean("first_run")) {
+                service.addDefault();
+                getConfig().set("first_run", false);
+            }
         } catch (Exception e) {
             System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cConnection and Tables Error:¤r " + e);
         }
@@ -51,6 +54,9 @@ public class SuggestionBox extends JavaPlugin implements Listener {
             metrics.start();
         } catch (IOException e) {
             // Failed to submit the stats :-(
+        }
+        if (!getConfig().contains("first_run")) {
+            getConfig().set("first_run", false);
         }
     }
 
