@@ -4,7 +4,7 @@ main: me.eccentric_nz.plugins.suggestionbox.SuggestionBox
 name: SuggestionBox
 startup: postworld
 dev-url: http://dev.bukkit.org/server-mods/suggestionbox/
-version: '1.0'
+version: '1.0.2'
 permissions:
   suggest.admin:
     description: Allow players access administer SuggestionBox.
