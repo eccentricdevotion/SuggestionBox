@@ -89,7 +89,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 } catch (SQLException e) {
                     System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't save suggestions:¤r " + e);
                 }
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Thank you for your "+t.toLowerCase()+"!");
+                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Thank you for your " + t.toLowerCase() + "!");
                 return true;
             }
         }
@@ -169,10 +169,17 @@ public class SuggestionBoxCommands implements CommandExecutor {
                     return false;
                 }
                 sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "LIST");
-                sender.sendMessage("ID | Suggestion | Player | Type | Priority");
+                sender.sendMessage("No. | ID | Suggestion | Player | Type | Priority");
+                int i = 1;
                 while (rsList.next()) {
                     int id = rsList.getInt("sb_id");
-                    String s = rsList.getString("suggestion").substring(0, 20);
+                    int str_len = rsList.getString("suggestion").length();
+                    String s;
+                    if (str_len > 20) {
+                        s = rsList.getString("suggestion").substring(0, 20);
+                    } else {
+                        s = rsList.getString("suggestion").substring(0, str_len);
+                    }
                     String p = rsList.getString("player");
                     String t = rsList.getString("type");
                     String y;
@@ -190,8 +197,9 @@ public class SuggestionBoxCommands implements CommandExecutor {
                         default:
                             y = "";
                     }
-                    sender.sendMessage(id + " | " + s + "... | " + p + " | " + t + " | " + y);
+                    sender.sendMessage(i + " | " + id + " | " + s + "... | " + p + " | " + t + " | " + y);
                     sender.sendMessage("----------");
+                    i++;
                 }
                 rsList.close();
                 statement.close();
