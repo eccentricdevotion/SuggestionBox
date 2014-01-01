@@ -2,13 +2,12 @@ package me.eccentric_nz.plugins.suggestionbox;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class SuggestionBoxDatabase {
 
-    private static SuggestionBoxDatabase instance = new SuggestionBoxDatabase();
+    private static final SuggestionBoxDatabase instance = new SuggestionBoxDatabase();
     public Connection connection = null;
     public Statement statement;
 

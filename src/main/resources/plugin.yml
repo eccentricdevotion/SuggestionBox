@@ -52,3 +52,9 @@ commands:
     usage: /<command> [SuggestionBox ID] [NORMAL|MEDIUM|HIGH]
     permission: suggest.admin
     permission-message: You don't have the permission <permission> to use this command
+  sbclear:
+    aliases: [sbc,suggestboxclear,suggestclear]
+    description: Clear all suggestions, comments, questions and requests from the database.
+    usage: /<command>
+    permission: suggest.admin
+    permission-message: You don't have the permission <permission> to use this command

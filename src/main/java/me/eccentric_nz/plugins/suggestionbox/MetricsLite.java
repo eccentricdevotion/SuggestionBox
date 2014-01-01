@@ -238,7 +238,7 @@ public class MetricsLite {
      *
      * @return the File object for the config file
      */
-    public File getConfigFile() {
+    public final File getConfigFile() {
         // I believe the easiest way to get the base folder (e.g craftbukkit set via -P) for plugins to use
         // is to abuse the plugin object we already have
         // plugin.getDataFolder() => base/plugins/PluginA/
@@ -315,13 +315,14 @@ public class MetricsLite {
         try {
             Class.forName("mineshafter.MineServer");
             return true;
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             return false;
         }
     }
 
     /**
-     * <p>Encode a key/value data pair to be used in a HTTP post request. This
+     * <p>
+     * Encode a key/value data pair to be used in a HTTP post request. This
      * INCLUDES a & so the first key/value pair MUST be included manually,
      * e.g:</p>
      * <code>

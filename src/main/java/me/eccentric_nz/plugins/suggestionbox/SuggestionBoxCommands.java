@@ -21,7 +21,7 @@ import org.bukkit.entity.Player;
 
 public class SuggestionBoxCommands implements CommandExecutor {
 
-    private SuggestionBox plugin;
+    private final SuggestionBox plugin;
     SuggestionBoxDatabase service = SuggestionBoxDatabase.getInstance();
 
     public SuggestionBoxCommands(SuggestionBox plugin) {
@@ -87,7 +87,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                     statement.executeUpdate();
                     statement.close();
                 } catch (SQLException e) {
-                    System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't save suggestions:¤r " + e);
+                    System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't save suggestions: " + ChatColor.RESET + e);
                 }
                 sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Thank you for your " + t.toLowerCase() + "!");
                 return true;
@@ -130,7 +130,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsRead.close();
                 statement.close();
             } catch (SQLException e) {
-                System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't get suggestion to read:¤r " + e);
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't get suggestion to read:" + ChatColor.RESET + e);
             }
             return true;
         }
@@ -153,7 +153,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsID.close();
                 statement.close();
             } catch (SQLException e) {
-                System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't delete suggestion:¤r " + e);
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't delete suggestion:" + ChatColor.RESET + e);
             }
             sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Successfully deleted suggestion!");
             return true;
@@ -204,7 +204,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsList.close();
                 statement.close();
             } catch (SQLException e) {
-                System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't get suggestion list:¤r " + e);
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't get suggestion list:" + ChatColor.RESET + e);
             }
             return true;
         }
@@ -246,7 +246,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsID.close();
                 statement.close();
             } catch (SQLException e) {
-                System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't set priority:¤r " + e);
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't set priority:" + ChatColor.RESET + e);
             }
             sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Successfully updated suggestion priority!");
             return true;
@@ -297,14 +297,26 @@ public class SuggestionBoxCommands implements CommandExecutor {
                     }
                     bw.close();
                 } catch (IOException io) {
-                    System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't write to file:¤r " + io);
+                    System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't write to file:" + ChatColor.RESET + io);
                 }
                 rsFile.close();
                 statement.close();
             } catch (SQLException e) {
-                System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCouldn't get substitutions:¤r " + e);
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't get substitutions:" + ChatColor.RESET + e);
             }
             sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Successfully wrote suggestions to file!");
+            return true;
+        }
+        if (cmd.getName().equalsIgnoreCase("sbclear")) {
+            try {
+                Connection connection = service.getConnection();
+                Statement statement = connection.createStatement();
+                String queryClear = "DELETE FROM suggestions";
+                statement.executeUpdate(queryClear);
+            } catch (SQLException e) {
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't clear suggestions:" + ChatColor.RESET + e);
+            }
+            sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "All suggestions were deleted!");
             return true;
         }
         return false;

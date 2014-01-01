@@ -2,7 +2,9 @@ package me.eccentric_nz.plugins.suggestionbox;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -23,7 +25,7 @@ public class SuggestionBox extends JavaPlugin implements Listener {
 
         if (!getDataFolder().exists()) {
             if (!getDataFolder().mkdir()) {
-                System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCould not create directory!¤r");
+                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Could not create directory!");
                 System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "Requires you to manually make the SuggestionBox/ directory!");
             }
             getDataFolder().setWritable(true);
@@ -38,16 +40,17 @@ public class SuggestionBox extends JavaPlugin implements Listener {
                 getConfig().set("first_run", false);
             }
         } catch (Exception e) {
-            System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cConnection and Tables Error:¤r " + e);
+            System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Connection and Tables Error: " + ChatColor.RESET + e);
         }
 
-        commando = new SuggestionBoxCommands(plugin);
+        commando = new SuggestionBoxCommands(this);
         getCommand("suggest").setExecutor(commando);
         getCommand("sblist").setExecutor(commando);
         getCommand("sbread").setExecutor(commando);
         getCommand("sbdelete").setExecutor(commando);
         getCommand("sbpriority").setExecutor(commando);
         getCommand("sbfile").setExecutor(commando);
+        getCommand("sbclear").setExecutor(commando);
 
         try {
             MetricsLite metrics = new MetricsLite(this);
@@ -65,8 +68,8 @@ public class SuggestionBox extends JavaPlugin implements Listener {
         this.saveConfig();
         try {
             service.connection.close();
-        } catch (Exception e) {
-            System.out.println(SuggestionBoxConstants.MY_PLUGIN_NAME + "¤cCould not close database connection:¤r " + e);
+        } catch (SQLException e) {
+            System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Could not close database connection: " + ChatColor.RESET + e);
         }
     }
 
