@@ -18,3 +18,9 @@ xcuserdata
 CVS
 /target/
 /lib/
+SuggestionBox.iml
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/modules.xml
+.idea/misc.xml
+.idea/compiler.xml
