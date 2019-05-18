@@ -52,13 +52,6 @@ public class SuggestionBox extends JavaPlugin implements Listener {
         getCommand("sbfile").setExecutor(commando);
         getCommand("sbclear").setExecutor(commando);
 
-        try {
-            MetricsLite metrics = new MetricsLite(this);
-            metrics.start();
-        } catch (IOException e) {
-            // Failed to submit the stats :-(
-        }
-        if (!getConfig().contains("first_run")) {
             getConfig().set("first_run", false);
         }
     }
