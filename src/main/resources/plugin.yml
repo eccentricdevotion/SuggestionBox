@@ -1,10 +1,11 @@
 author: eccentric_nz
-description: SuggestionBox is a plugin for obtaining suggestions, comments, questions, and requests for your Bukkit server.
-main: me.eccentric_nz.plugins.suggestionbox.SuggestionBox
+description: SuggestionBox is a plugin for obtaining suggestions, comments, questions, and requests for your Spigot / Paper server.
+main: me.eccentric_nz.suggestionbox.SuggestionBox
 name: SuggestionBox
 startup: postworld
 dev-url: http://dev.bukkit.org/server-mods/suggestionbox/
-version: '1.0.3'
+version: '1.0.4'
+api-version: 1.13
 permissions:
   suggest.admin:
     description: Allow players access administer SuggestionBox.
