@@ -1,4 +1,4 @@
-package me.eccentric_nz.plugins.suggestionbox;
+package me.eccentric_nz.suggestionbox;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -15,13 +15,13 @@ public class SuggestionBoxDatabase {
         return instance;
     }
 
+    public Connection getConnection() {
+        return connection;
+    }
+
     public void setConnection(String path) throws Exception {
         Class.forName("org.sqlite.JDBC");
         connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-    }
-
-    public Connection getConnection() {
-        return connection;
     }
 
     public void createTables() {
@@ -31,18 +31,18 @@ public class SuggestionBoxDatabase {
             statement.executeUpdate(querySuggestions);
             statement.close();
         } catch (SQLException e) {
-            System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + " Create table error: " + e);
+            System.err.println(SuggestionBox.CHAT_PREFIX + " Create table error: " + e);
         }
     }
 
     public void addDefault() {
         try {
             statement = connection.createStatement();
-            String queryAddDefault = "INSERT INTO suggestions (suggestion, player, type, priority) VALUES ('Welcome to SuggestionBox!', 'eccentric_nz','Comment',3)";
+            String queryAddDefault = "INSERT INTO suggestions (suggestion, player, type, priority) VALUES ('Welcome to SuggestionBox!', 'eccentric_nz', 'Comment', 3)";
             statement.executeUpdate(queryAddDefault);
             statement.close();
         } catch (SQLException e) {
-            System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + " Create table error: " + e);
+            System.err.println(SuggestionBox.CHAT_PREFIX + " Create table error: " + e);
         }
     }
 

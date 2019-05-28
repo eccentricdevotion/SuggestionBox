@@ -1,23 +1,21 @@
-package me.eccentric_nz.plugins.suggestionbox;
+package me.eccentric_nz.suggestionbox;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
 public class SuggestionBoxCommands implements CommandExecutor {
 
@@ -34,7 +32,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
         // check there is the right number of arguments
         if (cmd.getName().equalsIgnoreCase("suggest")) {
             if (args.length == 0) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Help"); //suggestion, comment, question or request
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Help"); //suggestion, comment, question or request
                 sender.sendMessage(ChatColor.GREEN + "/suggest [s|c|q|r] [Your text here]");
                 sender.sendMessage("Change the options between the square brackets - [ ]");
                 sender.sendMessage(ChatColor.BOLD + "s" + ChatColor.RESET + " = suggestion");
@@ -45,26 +43,16 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 sender.sendMessage("List existing suggestions, comments, questions or requests");
                 return true;
             }
-            String theType = args[0];
-            boolean tOK = false;
-            int tkey = 0;
-            for (String type : SuggestionBoxConstants.SBTYPE) {
-                if (theType.equalsIgnoreCase(type.substring(0, 1))) {
-                    tOK = true;
-                    break;
-                }
-                tkey++;
-            }
-            if (tOK == false) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Not a valid suggestion type!");
+            String theType = args[0].toLowerCase(Locale.ENGLISH);
+            Type type = Type.getByArgument().get(theType);
+            if (type == null) {
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Not a valid suggestion type!");
                 return false;
             }
             if (args.length < 2) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Not enough command arguments!");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Not enough command arguments!");
                 return false;
-            }
-            if (args.length > 1) {
-                String suggest = "";
+            } else {
                 StringBuilder sb = new StringBuilder(args[1]);
                 for (int i = 2; i < args.length; i++) {
                     sb.append(" ").append(args[i]);
@@ -77,25 +65,24 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 } else {
                     p = "Admin via console";
                 }
-                String t = SuggestionBoxConstants.SBTYPE[tkey];
                 try {
                     Connection connection = service.getConnection();
                     PreparedStatement statement = connection.prepareStatement("INSERT INTO suggestions (suggestion, type, player) VALUES (?,?,?)");
                     statement.setString(1, endSuggest);
-                    statement.setString(2, t);
+                    statement.setString(2, type.getName());
                     statement.setString(3, p);
                     statement.executeUpdate();
                     statement.close();
                 } catch (SQLException e) {
-                    System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't save suggestions: " + ChatColor.RESET + e);
+                    System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't save suggestions: " + ChatColor.RESET + e);
                 }
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Thank you for your " + t.toLowerCase() + "!");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Thank you for your " + type.getName() + "!");
                 return true;
             }
         }
         if (cmd.getName().equalsIgnoreCase("sbread")) {
             if (args.length == 0) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "You must specify a SuggestionBox ID number!");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "You must specify a SuggestionBox ID number!");
                 return false;
             }
             try {
@@ -104,10 +91,10 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 String queryRead = "SELECT * FROM suggestions WHERE sb_id = " + args[0];
                 ResultSet rsRead = statement.executeQuery(queryRead);
                 if (!rsRead.isBeforeFirst()) {
-                    sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Could not find that suggestion!");
+                    sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Could not find that suggestion!");
                     return false;
                 }
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "READ");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "READ");
                 sender.sendMessage("-- " + rsRead.getString("type") + " --");
                 sender.sendMessage(rsRead.getString("suggestion"));
                 sender.sendMessage("-- Who: " + rsRead.getString("player"));
@@ -130,13 +117,13 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsRead.close();
                 statement.close();
             } catch (SQLException e) {
-                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't get suggestion to read:" + ChatColor.RESET + e);
+                System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't get suggestion to read:" + ChatColor.RESET + e);
             }
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("sbdelete")) {
             if (args.length == 0) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "You must specify a SuggestionBox ID number!");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "You must specify a SuggestionBox ID number!");
                 return false;
             }
             try {
@@ -145,7 +132,7 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 String queryChkID = "SELECT sb_id FROM suggestions WHERE sb_id = " + args[0];
                 ResultSet rsID = statement.executeQuery(queryChkID);
                 if (!rsID.isBeforeFirst()) {
-                    sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Could not find that suggestion!");
+                    sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Could not find that suggestion!");
                     return false;
                 }
                 String queryDelete = "DELETE FROM suggestions WHERE sb_id = " + args[0];
@@ -153,9 +140,9 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsID.close();
                 statement.close();
             } catch (SQLException e) {
-                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't delete suggestion:" + ChatColor.RESET + e);
+                System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't delete suggestion:" + ChatColor.RESET + e);
             }
-            sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Successfully deleted suggestion!");
+            sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Successfully deleted suggestion!");
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("sblist")) {
@@ -165,10 +152,10 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 String queryList = "SELECT * FROM suggestions ORDER BY type, priority DESC";
                 ResultSet rsList = statement.executeQuery(queryList);
                 if (!rsList.isBeforeFirst()) {
-                    sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "There are no suggestions in the box yet!");
+                    sender.sendMessage(SuggestionBox.CHAT_PREFIX + "There are no suggestions in the box yet!");
                     return false;
                 }
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "LIST");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "LIST");
                 sender.sendMessage("No. | ID | Suggestion | Player | Type | Priority");
                 int i = 1;
                 while (rsList.next()) {
@@ -204,51 +191,46 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 rsList.close();
                 statement.close();
             } catch (SQLException e) {
-                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't get suggestion list:" + ChatColor.RESET + e);
+                System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't get suggestion list:" + ChatColor.RESET + e);
             }
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("sbpriority")) {
             if (args.length == 0) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "You must specify a SuggestionBox ID number!");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "You must specify a SuggestionBox ID number!");
                 return false;
             }
             if (args.length < 2) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Not enough command arguments!");
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Not enough command arguments!");
                 return false;
             }
             String p = args[1].toUpperCase();
-            boolean pOK = false;
-            int i = 0;
-            for (String priority : SuggestionBoxConstants.PRIORITY) {
-                if (p.equals(priority)) {
-                    pOK = true;
-                    break;
-                }
-                i++;
-            }
-            if (pOK == false) {
-                sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Does not recognise that priority!");
+            int i;
+            Priority priority;
+            try {
+                priority = Priority.valueOf(p);
+                i = priority.getId();
+            } catch (IllegalArgumentException e) {
+                sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Does not recognise that priority!");
                 return false;
             }
-            int pnum = i;
             try {
                 Connection connection = service.getConnection();
                 Statement statement = connection.createStatement();
                 String queryChkID = "SELECT sb_id FROM suggestions WHERE sb_id = " + args[0];
                 ResultSet rsID = statement.executeQuery(queryChkID);
                 if (!rsID.isBeforeFirst()) {
-                    sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Could not find that suggestion!");
+                    sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Could not find that suggestion!");
                     return false;
                 }
-                String queryPriority = "UPDATE suggestions SET priority = " + pnum + " WHERE sb_id = " + args[0];
+                String queryPriority = "UPDATE suggestions SET priority = " + i + " WHERE sb_id = " + args[0];
                 statement.executeUpdate(queryPriority);
                 rsID.close();
                 statement.close();
             } catch (SQLException e) {
-                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't set priority:" + ChatColor.RESET + e);
+                System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't set priority:" + ChatColor.RESET + e);
             }
-            sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Successfully updated suggestion priority!");
+            sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Successfully updated suggestion priority!");
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("sbfile")) {
@@ -297,14 +279,14 @@ public class SuggestionBoxCommands implements CommandExecutor {
                     }
                     bw.close();
                 } catch (IOException io) {
-                    System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't write to file:" + ChatColor.RESET + io);
+                    System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't write to file:" + ChatColor.RESET + io);
                 }
                 rsFile.close();
                 statement.close();
             } catch (SQLException e) {
-                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't get substitutions:" + ChatColor.RESET + e);
+                System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't get substitutions:" + ChatColor.RESET + e);
             }
-            sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "Successfully wrote suggestions to file!");
+            sender.sendMessage(SuggestionBox.CHAT_PREFIX + "Successfully wrote suggestions to file!");
             return true;
         }
         if (cmd.getName().equalsIgnoreCase("sbclear")) {
@@ -314,9 +296,9 @@ public class SuggestionBoxCommands implements CommandExecutor {
                 String queryClear = "DELETE FROM suggestions";
                 statement.executeUpdate(queryClear);
             } catch (SQLException e) {
-                System.err.println(SuggestionBoxConstants.MY_PLUGIN_NAME + ChatColor.RED + "Couldn't clear suggestions:" + ChatColor.RESET + e);
+                System.err.println(SuggestionBox.CHAT_PREFIX + ChatColor.RED + "Couldn't clear suggestions:" + ChatColor.RESET + e);
             }
-            sender.sendMessage(SuggestionBoxConstants.MY_PLUGIN_NAME + "All suggestions were deleted!");
+            sender.sendMessage(SuggestionBox.CHAT_PREFIX + "All suggestions were deleted!");
             return true;
         }
         return false;
